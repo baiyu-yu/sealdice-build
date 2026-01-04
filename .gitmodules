@@ -4,8 +4,8 @@
 	branch = test
 [submodule "sealdice-ui"]
 	path = sealdice-ui
-	url = https://github.com/sealdice/sealdice-ui
-	branch = master
+	url = https://github.com/baiyu-yu/sealdice-ui
+	branch = fun
 [submodule "sealdice-android"]
 	path = sealdice-android
 	url = https://github.com/sealdice/sealdice-android
