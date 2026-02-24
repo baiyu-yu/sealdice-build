@@ -104,14 +104,12 @@ jobs:
     strategy:
       matrix:
         goos: [ linux, windows ]
-        goarch: [ '386', amd64, arm64 ]
+        goarch: [ '386', amd64 ]
         exclude:
           - goos: linux
             goarch: '386'
           - goos: windows
             goarch: arm64
-          - goos: windows
-            goarch: '386'
       fail-fast: true
     steps:
       - name: Apt-get Update
@@ -126,11 +124,9 @@ jobs:
       - name: Install Cross-compiler for Linux Amd64 Musl
         if: matrix.goos == 'linux' && matrix.goarch == 'amd64'
         run: sudo apt-get -y install musl-tools
-      - name: Install Cross-compiler for Linux Arm64 Musl
-        if: matrix.goos == 'linux' && matrix.goarch == 'arm64'
-        run: |
-          wget https://github.com/sealdice/tooolchain/releases/download/1/aarch64-linux-musl-cross.tgz;
-          tar zxf aarch64-linux-musl-cross.tgz;
+      
+      # 已移除 ARM64 相关的交叉编译器安装步骤
+
       - name: Install Go
         uses: actions/setup-go@v5
         with:
@@ -180,8 +176,6 @@ jobs:
             echo "CC=x86_64-w64-mingw32-gcc" >> $GITHUB_ENV;
           elif [ $GOOS = 'linux' ] && [ $GOARCH = 'amd64' ]; then
             echo "CC=musl-gcc" >> $GITHUB_ENV;
-          elif [ $GOOS = 'linux' ] && [ $GOARCH = 'arm64' ]; then
-            echo "CC=$(readlink -f ../aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc)" >> $GITHUB_ENV;
           fi
       - name: Build Binary
         if: matrix.goos != 'linux'
@@ -219,88 +213,21 @@ jobs:
           name: sealdice-core_${{ env.PROJECT_VERSION_C }}_${{ matrix.goos }}_${{ matrix.goarch }}
           path: ./sealdice-core/output
 
-  core-darwin-build:
-    name: Build Core
-    runs-on: macos-latest
-    needs: ui-build
-    strategy:
-      matrix:
-        goos: [ darwin ]
-        goarch: [ amd64, arm64 ]
-      fail-fast: true
-    steps:
-      - name: Code
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-      - name: Install Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.25"
-          cache-dependency-path: sealdice-core/go.sum
-      - name: Install dependencies
-        working-directory: ./sealdice-core
-        run: |
-          go mod tidy
-          go get .
-      - name: Get UI Resources
-        uses: actions/download-artifact@v4
-        with:
-          name: sealdice-ui
-          path: ./sealdice-core/static/frontend
-
-      - name: Get current time
-        uses: Kaven-Universe/github-action-current-date-time@v1
-        id: currentTime
-        with:
-          format: YYYYMMDD
-          timezone-offset: -480
-
-      - name: Set Env
-        working-directory: ./sealdice-core
-        run: |
-          echo "PROJECT_VERSION_C=${CUR_TIME}-${COMMIT_ID::7}" >> $GITHUB_ENV;
-        env:
-          CUR_TIME: ${{ steps.currentTime.outputs.time }}
-
-      - name: Build Binary
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-          GO111MODULE: on
-          CGO_ENABLED: 1
-          CGO_FLAGS: -Werror=unused-variable -Werror=implicit-function-declaration -O2 -mmacosx-version-min=10.12
-          CGO_CFLAGS: -mmacosx-version-min=10.12
-          CUR_TIME: ${{ steps.currentTime.outputs.time }}
-          SEAL_TRUSTED_PRIVATE_KEY: ${{ secrets.SEAL_TRUSTED_PRIVATE_KEY }}
-        working-directory: ./sealdice-core
-        run: go build -o "output/sealdice-core" -trimpath -ldflags "-s -w -X sealdice-core/dice.VERSION_PRERELEASE=-dev -X sealdice-core/dice.VERSION_BUILD_METADATA=+${CUR_TIME}.${COMMIT_ID::7} -X sealdice-core/dice.APP_CHANNEL=dev  -X 'sealdice-core/dice.DefaultSignUrl=${NT_SIGN_URL}' -X 'sealdice-core/dice.SealTrustedClientPrivateKey=${SEAL_TRUSTED_PRIVATE_KEY}'" .
-      - name: Upload Core
-        uses: actions/upload-artifact@v4
-        with:
-          name: sealdice-core_${{ env.PROJECT_VERSION_C }}_${{ matrix.goos }}_${{ matrix.goarch }}
-          path: ./sealdice-core/output
-
   pc-pack:
     name: PC Pack
     runs-on: ubuntu-latest
     needs:
       - resources-download
       - core-build
-      - core-darwin-build
     strategy:
       matrix:
-        goos: [ linux, windows, darwin ]
-        goarch: [ '386', amd64, arm64 ]
+        goos: [ linux, windows ]
+        goarch: [ '386', amd64 ]
         exclude:
           - goos: linux
             goarch: '386'
           - goos: windows
             goarch: arm64
-          - goos: windows
-            goarch: '386'
-          - goos: darwin
-            goarch: '386'
     steps:
       - name: Get current time
         uses: Kaven-Universe/github-action-current-date-time@v1
@@ -343,17 +270,13 @@ jobs:
       - commit-num-check
     strategy:
       matrix:
-        goos: [ linux, windows, darwin ]
-        goarch: [ '386', amd64, arm64 ]
+        goos: [ linux, windows ]
+        goarch: [ '386', amd64 ]
         exclude:
           - goos: linux
             goarch: '386'
           - goos: windows
             goarch: arm64
-          - goos: windows
-            goarch: '386'
-          - goos: darwin
-            goarch: '386'
     steps:
       - name: Get current time
         uses: Kaven-Universe/github-action-current-date-time@v1
