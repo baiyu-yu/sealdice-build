@@ -104,12 +104,7 @@ jobs:
     strategy:
       matrix:
         goos: [ linux, windows ]
-        goarch: [ '386', amd64 ]
-        exclude:
-          - goos: linux
-            goarch: '386'
-          - goos: windows
-            goarch: arm64
+        goarch: [ amd64 ]
       fail-fast: true
     steps:
       - name: Apt-get Update
@@ -124,8 +119,6 @@ jobs:
       - name: Install Cross-compiler for Linux Amd64 Musl
         if: matrix.goos == 'linux' && matrix.goarch == 'amd64'
         run: sudo apt-get -y install musl-tools
-      
-      # 已移除 ARM64 相关的交叉编译器安装步骤
 
       - name: Install Go
         uses: actions/setup-go@v5
@@ -170,9 +163,7 @@ jobs:
           else
             echo "BINARY_NAME=sealdice-core" >> $GITHUB_ENV;
           fi
-          if [ $GOOS = 'windows' ] && [ $GOARCH = '386' ]; then
-            echo "CC=i686-w64-mingw32-gcc" >> $GITHUB_ENV;
-          elif [ $GOOS = 'windows' ] && [ $GOARCH = 'amd64' ]; then
+          if [ $GOOS = 'windows' ] && [ $GOARCH = 'amd64' ]; then
             echo "CC=x86_64-w64-mingw32-gcc" >> $GITHUB_ENV;
           elif [ $GOOS = 'linux' ] && [ $GOARCH = 'amd64' ]; then
             echo "CC=musl-gcc" >> $GITHUB_ENV;
@@ -222,12 +213,7 @@ jobs:
     strategy:
       matrix:
         goos: [ linux, windows ]
-        goarch: [ '386', amd64 ]
-        exclude:
-          - goos: linux
-            goarch: '386'
-          - goos: windows
-            goarch: arm64
+        goarch: [ amd64 ]
     steps:
       - name: Get current time
         uses: Kaven-Universe/github-action-current-date-time@v1
@@ -271,12 +257,7 @@ jobs:
     strategy:
       matrix:
         goos: [ linux, windows ]
-        goarch: [ '386', amd64 ]
-        exclude:
-          - goos: linux
-            goarch: '386'
-          - goos: windows
-            goarch: arm64
+        goarch: [ amd64 ]
     steps:
       - name: Get current time
         uses: Kaven-Universe/github-action-current-date-time@v1
