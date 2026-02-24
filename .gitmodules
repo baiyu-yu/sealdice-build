@@ -1,11 +1,11 @@
 [submodule "sealdice-core"]
 	path = sealdice-core
 	url = https://github.com/baiyu-yu/sealdice-core
-	branch = webui
+	branch = config
 [submodule "sealdice-ui"]
 	path = sealdice-ui
 	url = https://github.com/baiyu-yu/sealdice-ui
-	branch = webui
+	branch = config
 [submodule "sealdice-android"]
 	path = sealdice-android
 	url = https://github.com/sealdice/sealdice-android
