@@ -1,11 +1,11 @@
 [submodule "sealdice-core"]
 	path = sealdice-core
 	url = https://github.com/baiyu-yu/sealdice-core
-	branch = officialqq
+	branch = ep
 [submodule "sealdice-ui"]
 	path = sealdice-ui
 	url = https://github.com/baiyu-yu/sealdice-ui
-	branch = officialqq
+	branch = master
 [submodule "sealdice-android"]
 	path = sealdice-android
 	url = https://github.com/sealdice/sealdice-android
